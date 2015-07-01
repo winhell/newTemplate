@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="newTemplate:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="Metronic.war">
+      <element id="artifact" artifact-name="newTemplate:war exploded" />
+    </root>
+  </artifact>
+</component>
