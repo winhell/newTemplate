@@ -81,6 +81,7 @@ MetronicApp.factory('settings', ['$rootScope', function($rootScope) {
 
     $rootScope.settings = settings;
 
+
     return settings;
 }]);
 
@@ -90,6 +91,7 @@ MetronicApp.controller('AppController', ['$scope', '$rootScope', function($scope
         Metronic.initComponents(); // init core components
         //Layout.init(); //  Init entire layout(header, footer, sidebar, etc) on page load if the partials included in server side instead of loading with ng-include directive 
     });
+
 }]);
 
 /***
@@ -110,7 +112,25 @@ MetronicApp.controller('SidebarController', ['$scope','$http', function($scope,$
     $scope.$on('$includeContentLoaded', function() {
         Layout.initSidebar(); // init sidebar
     });
+    var menuJson = [];
+    $http.get("getUserMenus.action?="+Math.floor(Math.random() * (new Date()).getTime()))
+        .success(function(data,status,headers,config){
+            $.each(data,function(index,item) {
+                if (item.parentId == '0') {
 
+                var tempItem = item;
+                var childern = [];
+                $.each(data, function (idx, itm) {
+                    if (itm.parentId == item.id)
+                        childern.push(itm);
+                });
+                if (childern.length > 0)
+                    tempItem.children = childern;
+                menuJson.push(tempItem);
+                }
+            });
+            $scope.menus = menuJson;
+        });
 }]);
 
 /* Setup Layout Part - Quick Sidebar */
@@ -171,7 +191,35 @@ MetronicApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvi
                 }]
             }
         })
+        .state('userMgr',{
+            url:"/system/userMgr.html",
+            templateUrl:"views/system/userMgr.html",
+            controller: "UserMgrController",
+            data:{pageTitle:'用户管理'},
+            resolve:{
+                deps: ['$ocLazyLoad',function($ocLazyLoad){
+                    return $ocLazyLoad.load({
+                        name: 'MetronicApp',
+                        insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
+                        files: [
+                            '../../assets/global/plugins/select2/select2.css',
+                            '../../assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css',
+                            '../../assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css',
 
+                            '../../assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js',
+                            '../../assets/global/plugins/select2/select2.min.js',
+                            '../../assets/global/plugins/datatables/all.min.js',
+
+                            '../../assets/global/scripts/datatable.js',
+                            '../../assets/global/scripts/datatable.common.js',
+                            'js/scripts/userMgr.js',
+
+                            'js/controllers/userMgrController.js'
+                        ]
+                    });
+                }]
+            }
+        })
         // AngularJS plugins
         .state('fileupload', {
             url: "/file_upload.html",
@@ -504,4 +552,12 @@ MetronicApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvi
 /* Init global settings and run the app */
 MetronicApp.run(["$rootScope", "settings", "$state", function($rootScope, settings, $state) {
     $rootScope.$state = $state; // state to be accessed from view
+    //$rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
+    //    console.log(event);
+    //    console.log(toState);
+    //    console.log(toParams);
+    //    console.log(fromState);
+    //    console.log(fromParams);
+    //    window.location="../../login.html";
+    //});
 }]);

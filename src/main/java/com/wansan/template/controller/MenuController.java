@@ -5,6 +5,7 @@ import com.wansan.template.model.ResultEnum;
 import com.wansan.template.service.IPersonService;
 import com.wansan.template.service.IResourceService;
 import org.hibernate.HibernateException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -30,7 +31,6 @@ public class MenuController extends BaseController{
     private IResourceService resourceService;
 
     @RequestMapping(value = "/getUserMenus")
-
     public List<com.wansan.template.model.Resource> getMenus(){
         Object principal =  SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
